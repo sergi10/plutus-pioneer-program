@@ -1,36 +1,25 @@
 {-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE DeriveAnyClass      #-}
-{-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
 {-# LANGUAGE TemplateHaskell     #-}
 
-module Homework2 where
+module Homework1 where
 
 import qualified Plutus.V2.Ledger.Api as PlutusV2
-import           PlutusTx             (unstableMakeIsData,compile)
-import           PlutusTx.Prelude     (Bool (..), BuiltinData, otherwise, (==))
-import           Prelude              (undefined)
+import           PlutusTx             (compile)
+import           PlutusTx.Prelude     (otherwise,Bool (..), BuiltinData, fst, snd, (==), not)
 import           Utilities            (wrap)
 
 ---------------------------------------------------------------------------------------------------
 ----------------------------------- ON-CHAIN / VALIDATOR ------------------------------------------
 
-data MyRedeemer = MyRedeemer
-    { flag1 :: Bool
-    , flag2 :: Bool
-    }
-
-PlutusTx.unstableMakeIsData ''MyRedeemer
-
 {-# INLINABLE mkValidator #-}
--- Create a validator that unlocks the funds if MyRedemeer's flags are different
-mkValidator :: () -> MyRedeemer -> PlutusV2.ScriptContext -> Bool
--- mkValidator = undefined
-mkValidator _ mr _ 
-    | flag1 mr == flag2 mr    = False   
-    | otherwise               = True
-
+-- This should validate if and only if the two Booleans in the redeemer are True!
+mkValidator :: () -> (Bool, Bool) -> PlutusV2.ScriptContext -> Bool
+mkValidator _ a _ 
+    | not(fst a )       = False
+    | fst a == snd a    = True
+    | otherwise         = False
 
 wrappedVal :: BuiltinData -> BuiltinData -> BuiltinData -> ()
 wrappedVal = wrap mkValidator
