@@ -37,7 +37,7 @@ mkParameterizedVestingValidator _beneficiary _deadline () _ctx =
 
 {-# INLINABLE  mkWrappedParameterizedVestingValidator #-}
 mkWrappedParameterizedVestingValidator :: PubKeyHash -> BuiltinData -> BuiltinData -> BuiltinData -> ()
-mkWrappedParameterizedVestingValidator = wrap . mkParameterizedVestingValidator
+mkWrappedParameterizedVestingValidator = wrapValidator . mkParameterizedVestingValidator
 
 validator :: PubKeyHash -> Validator
 validator beneficiary = mkValidatorScript ($$(compile [|| mkWrappedParameterizedVestingValidator ||]) `applyCode` liftCode beneficiary)
